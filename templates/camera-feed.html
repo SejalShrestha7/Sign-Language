@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/assets/css/style.css">
+    <link rel="stylesheet" href="../static/assets/css/bootstrap.min.css">
+    <title>Document</title>
+</head>
+
+<body class="inner">
+    <div class="container  my-5 card">
+        <div class="row">
+            <div class="py-large col-lg-6 order-lg-1 order-2 pl-4 pr-5">
+
+                <a class="inner-link" href="http://127.0.0.1:8000/"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                        height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+                    </svg> Home</a>
+
+                <div class="section-title mt-3" style="margin-bottom: 45px;">
+                    <h3>Sign Language to Text(ASL)</h3>
+                    <span style="margin-left: 0;"></span>
+                </div>
+                <div class="cam-feed" id="current-symbol">
+                    <p>Character:</p>
+                    <div class="text-box">
+                        <span class="text-input" id="character-value">Empty</span>
+                    </div>
+                </div>
+
+                {% comment %} <div class="cam-feed" id="word">
+                    <p>Word:</p>
+                    <div class="text-box">
+                        <span class="text-input" id="word-value"></span>
+                    </div>
+                </div>
+
+                <div class="cam-feed" id="sentence">
+                    <p>Sentence:</p>
+                    <div class="text-box">
+                        <span class="text-input" id="sentence-value"></span>
+                    </div>
+                </div> {% endcomment %}
+                
+ 
+            </div>
+            <div class="col-lg-6 order-lg-2 order-1 d-flex align-items-center justify-content-center bg"
+                style="background-image: url('../static/assets/img/abstrac.jpg');">
+
+                {% comment %} <div id="image-panel" class=" d-flex justify-content-end align-items-center round h-100" > {% endcomment %}
+                    {% comment %} <video src=" {{output}}" id="webcam-video" width="500" height="300" autoplay></video> {% endcomment %}
+                    {% comment %} <iframe src="{{output}}" width="500" height="500"></iframe> {% endcomment %}
+                {% comment %} </div> {% endcomment %}
+                
+                <div id="image-panel" class=" d-flex justify-content-end align-items-center round h-100">
+                    <img id="videoFeed" src="" width="500" height="400" alt="Camera Feed">
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- {% comment %} <pre> {{output}}</pre> {% endcomment %} -->
+    </div>
+    <script src="../static/assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var charactersArray = [];
+        const textInput = document.getElementById('character-value').textContent;
+        $(document).ready(function () {
+            $('#videoFeed').attr('src', '/camera-feed/'); // Set the source to your Django camera feed endpoint
+    
+            $(document).keypress(function (e) {
+                if (e.which === 32) {  // Spacebar key code
+                    // AJAX request to trigger prediction from Django backend
+                    $.ajax({
+                        url: '/perform-prediction/',
+                        type: 'GET',
+                        success: function (data) {
+                            // Handle the response data
+                            if (data.character === "del") {
+                                // Remove the last character
+                                charactersArray.pop();
+                            } else if (data.character !== "nothing" && data.character !== "space") {
+                                charactersArray.push(data.character);
+                            } else if (data.character === "space") {
+                                charactersArray.push(' ');
+                            }
+            
+                            // Update UI elements
+                            $('#character-value').text(data.character);
+            
+                            // Check if charactersArray is defined before using join
+                            if (charactersArray) {
+                                $('#word-value').text(charactersArray.join(','));
+                                $('#sentence-value').text(charactersArray.join(''));
+                            }
+            
+                            // Array processing code for splitting into words
+                            var wordsArray = [];
+                            var currentWord = "";
+            
+                            for (var i = 0; i < charactersArray.length; i++) {
+                                if (charactersArray[i] !== ' ') {
+                                    currentWord += charactersArray[i];
+                                } else {
+                                    wordsArray.push(currentWord);
+                                    currentWord = "";
+                                }
+                            }
+            
+                            // Add the last word if not empty
+                            if (currentWord !== "") {
+                                wordsArray.push(currentWord);
+                            }
+            
+                            // Text-to-speech code
+                            if ('speechSynthesis' in window) {
+                                const synthesis = window.speechSynthesis;
+                                const utterance = new SpeechSynthesisUtterance(data.character);
+                                synthesis.speak(utterance);
+                            }
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                }
+            });
+            
+        });
+
+    </script>
+    
+</body>
+
+</html>
+</body>
+
+</html> 
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Camera Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        #videoContainer {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: auto;
+        }
+
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #startButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Feed</h1>
+    <button id="startButton">Start Camera Feed</button>
+
+    <div id="videoContainer">
+        <video id="videoFeed" autoplay playsinline></video>
+    </div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const videoFeed = document.getElementById('videoFeed');
+
+        startButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoFeed.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing the camera:', err);
+            }
+        });
+    </script>
+</body>
+</html> {% endcomment %}
