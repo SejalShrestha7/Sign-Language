@@ -29,7 +29,7 @@ model = load_model(os.path.join(os.getcwd(), "model", "GASLmodel.keras"))
 
 # Create your views here.
 def index(request):
-    pred = date(2025, 6, 23)
+    pred = date(2025, 7, 7)
 
     today = date.today()
 
